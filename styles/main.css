@@ -47,10 +47,27 @@ table {
 	border-spacing: 0;
 }
 
+.container {
+  margin: 0% auto;
+  padding: 2%;
+  width: 60%;
+}
 
 body {
+	/* 
+	background-color:  #F9FBFF;
+	color: rgba(6, 8, 15, 1);
+	*/
+
 	background-color: #121212;
 	color: rgba(255, 255, 255, 0.87);
+}
+
+header {
+	background-color: #121212;
+	/*
+	border-bottom: 2px solid #949599;
+	*/
 }
 
 h1 {
