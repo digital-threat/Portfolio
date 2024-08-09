@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Sergei Grigorev</title>
+        <link rel="stylesheet" href="/styles/main.css">
+        <link rel="stylesheet" href="/styles/project.css">
+        <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <h1 class="title">Sergei Grigorev</h1>
+                <h3 class="subtitle">Game Programmer</h3>
+            </div>
+            
+            <nav>
+                <a href="/index.html">Portfolio</a>
+                <a href="about.html">About</a>
+                <a href="assets/Sergei_Grigorev_CV.pdf" target="_blank">CV</a>
+            </nav>
+        </header>
+
+        <h2>Jim &amp; Jam</h2>
+        <h3 id="game-subtitle">Game Project 1 (Futuregames)</h3>
+        
+        <div class="content">
+            <div>
+                <div>
+                    <h3>Project Info</h3>
+                    <p>Role: Lead Programmer, Gameplay Programmer</p>
+                    <p>Team Size: 14</p>
+                    <p>Duration: 3 weeks</p>
+                    <p>Engine: Unity</p>
+                </div>
+                
+                <div>
+                    <h3>Escape the rapidly flooding sewer!</h3>
+                    <p>
+                        You play as Jim, an ordinary sewer rat that has grown up and spent their whole life in the sewers with their rat friend, Jam, when the sewer they've always called home suddenly floods!
+                    </p>
+                    <p>
+                        Hurry up and escape by scaling the walls, use sewer pipes and debris to ascend from the depths, and reunite with your rat friend before the water swallows you!
+                    </p>
+                </div>
+            </div>
+            
+            <video class="media" width="426" height="240" playsinline loop autoplay muted preload="metadata">
+                    <source src="/assets/videos/Jim_n_Jam_trailer.mp4" type="video/mp4">
+                    <source src="movie.ogg" type="video/ogg">
+                    Your browser does not support the video tag.
+            </video>
+            
+            <div>
+                <h3>Character, Camera, Controls</h3>
+                <p>
+                    My primary responsibility on the project was to create a player controller. The requirements included an orbiting camera, ability to jump, double jump, sprint and slide down steep slopes. I used Unity's built-in kinematic character controller as a base. I also implemented a state machine as a core structure of the controller to encapsulate different player states.
+                </p>
+                <h4>Slopes &amp; Slides</h4>
+                <p>An aspect of the controller I particularly struggled with was handling slopes.</p>
+                <h4>Reflection</h4>
+                <p>
+                    Working on Jim &amp; Jam has taught me much about the inherent complexity of character controllers. I don't want to sound too academic, but in all fairness it's a prime example of the multifaceted nature of game development. A good character controller is a synergy between level design, game feel and robust collision resolution. And if one or more of those areas aren't up to par? Well, you may get something that controls more like a tank than a rat.
+                </p>
+            </div>
+            
+            
+            <pre class="code-snippet"><code>
+public abstract class PlayerState
+{
+    public virtual string Name { get; protected set; }
+
+    protected Player player;
+    public PlayerState(Player player)
+    {
+    this.player = player;
+    }
+
+    public abstract void Enter();
+    public abstract void Exit();
+
+    public abstract PlayerState Transition();
+    public abstract void Update(float deltaTime);
+    public abstract void FixedUpdate(float deltaTime);
+}
+            </code></pre>            
+            
+            <div>
+                <h3>Leadership Role</h3>
+                <p>Role:</p>
+            </div>
+            
+        </div>
+
+        <footer>
+            <small>Made by myself with absolutely zero knowledge of</small>
+            <small id="rainbow-1">H</small><small id="rainbow-2">T</small><small id="rainbow-3">M</small><small id="rainbow-4">L</small>
+            <small>&</small>
+            <small id="rainbow-5">C</small><small id="rainbow-6">S</small><small id="rainbow-7">S</small>
+            <small>figuring it out on the go.</small>
+        </footer>
+    </body>
+</html>

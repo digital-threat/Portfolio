@@ -1,0 +1,27 @@
+.content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    column-gap: 16px;
+    margin-top: 30px
+}
+
+.media {
+    border-radius: 2px;
+    width: 70%;
+    height: auto;
+}
+
+.grid-video {
+ 
+}
+
+.code-snippet {
+    line-height: 1.3rem;
+    margin-left: 30px;
+}
+
+/* IDs */
+
+#game-subtitle {
+    font-size: 1.15rem;
+}
