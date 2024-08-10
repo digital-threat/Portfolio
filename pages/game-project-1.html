@@ -21,7 +21,7 @@
             <nav>
                 <a href="/index.html">Portfolio</a>
                 <a href="about.html">About</a>
-                <a href="assets/Sergei_Grigorev_CV.pdf" target="_blank">CV</a>
+                <a href="/assets/Sergei_Grigorev_CV.pdf" target="_blank">CV</a>
             </nav>
         </header>
 
@@ -58,40 +58,99 @@
             <div>
                 <h3>Character, Camera, Controls</h3>
                 <p>
-                    My primary responsibility on the project was to create a player controller. The requirements included an orbiting camera, ability to jump, double jump, sprint and slide down steep slopes. I used Unity's built-in kinematic character controller as a base. I also implemented a state machine as a core structure of the controller to encapsulate different player states.
-                </p>
-                <h4>Slopes &amp; Slides</h4>
-                <p>An aspect of the controller I particularly struggled with was handling slopes.</p>
-                <h4>Reflection</h4>
-                <p>
-                    Working on Jim &amp; Jam has taught me much about the inherent complexity of character controllers. I don't want to sound too academic, but in all fairness it's a prime example of the multifaceted nature of game development. A good character controller is a synergy between level design, game feel and robust collision resolution. And if one or more of those areas aren't up to par? Well, you may get something that controls more like a tank than a rat.
+                    My primary responsibility on the project was to create a player controller with an orbiting camera. I began by implementing a state machine to encapsulate different player states, such as jumping, sprinting and falling. To have more precise control over movement, I chose to work with a kinematic controller rather than a physics based one. I used Unity's built-in character controller as a base, but soon found myself dealing with a number of issues stemming from the limitations of the built-in controller. Jim would fly up into the air instead of stepping on a ledge, or hang on a ledge in a falling state, or slighly climb slopes that should be too steep, etc. I'd fix one thing only to find something else broke instead. Realizing I'm not making progress, I re-priorized my workload and focused on the most important tasks. One such task was implementing the ability to slide down steep slopes which was essential due to the abundance of round pipes in the game. I implemented it by casting a grid of rays down at the surface, then checking whether the surface angle for all hits is a stable slope. If it isn't stable, I add an additional downward force and project the velocity onto the slope.  
                 </p>
             </div>
             
-            
-            <pre class="code-snippet"><code>
-public abstract class PlayerState
+            <details>
+                <summary>Code - Sliding</summary>
+                <pre class="code-snippet">
+                    <code>
+private void FixedUpdate()
 {
-    public virtual string Name { get; protected set; }
+    isGrounded = IsGrounded();
+    isSliding = IsSliding(out var slideNormal);
 
-    protected Player player;
-    public PlayerState(Player player)
+    ApplyAcceleration(ref velocity, Time.deltaTime);
+    ApplyGravity(ref velocity, Time.deltaTime);
+    
+    if (isSliding)
     {
-    this.player = player;
+        Slide(slideNormal, ref velocity, Time.deltaTime)
     }
 
-    public abstract void Enter();
-    public abstract void Exit();
-
-    public abstract PlayerState Transition();
-    public abstract void Update(float deltaTime);
-    public abstract void FixedUpdate(float deltaTime);
+    controller.Move(velocity * Time.deltaTime);
+    velocity = controller.velocity;
 }
-            </code></pre>            
-            
+                    </code>
+                </pre>
+                <pre class="code-snippet">
+                    <code>
+private void Slide(Vector3 slideNormal, ref Vector3 velocity, float deltaTime)
+{
+    velocity.y -= slideForce * deltaTime;
+    velocity = Vector3.ProjectOnPlane(velocity, slideNormal);
+}
+                    </code>
+                </pre>
+                <pre class="code-snippet">
+                    <code>
+private bool IsSliding(out Vector3 slideNormal)
+{
+    slideNormal = Vector3.zero;
+
+    if (isGrounded) return false;
+
+    var radius = controller.radius;
+    var offset = radius;
+    var position = transform.position + new Vector3(0, radius, 0);
+
+    rayBuffer[0] = new Ray(position + new Vector3(-offset, 0, offset), Vector3.down);
+    rayBuffer[1] = new Ray(position + new Vector3(0, 0, offset), Vector3.down);
+    rayBuffer[2] = new Ray(position + new Vector3(offset, 0, offset), Vector3.down);
+    rayBuffer[3] = new Ray(position + new Vector3(-offset, 0, 0), Vector3.down);
+    rayBuffer[4] = new Ray(position + new Vector3(0, 0, 0), Vector3.down);
+    rayBuffer[5] = new Ray(position + new Vector3(offset, 0, 0), Vector3.down);
+    rayBuffer[6] = new Ray(position + new Vector3(-offset, 0, -offset), Vector3.down);
+    rayBuffer[7] = new Ray(position + new Vector3(0, 0, -offset), Vector3.down);
+    rayBuffer[8] = new Ray(position + new Vector3(offset, 0, -offset), Vector3.down);
+
+    foreach (var ray in rayBuffer)
+    {
+        int hits = Physics.RaycastNonAlloc(ray, slideCheckHits, slideRayLength, mask);
+
+        for (int i = 0; i < hits; i++)
+        {
+            float dot = Vector3.Dot(Vector3.up, slideCheckHits[i].normal);
+            if (dot < Mathf.Cos(slopeLimit * Mathf.Deg2Rad))
+            {
+                slideNormal = slideCheckHits[i].normal;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+                    </code>
+                </pre>  
+            </details>
+                
+                
             <div>
                 <h3>Leadership Role</h3>
-                <p>Role:</p>
+                <p>Text</p>
+            </div>
+            
+            
+            <div>
+                <h3>Fail, Fail, Succeed</h3>
+                <p>
+                    Working on Jim &amp; Jam has taught me much about the inherent complexity of character controllers. Thinking about it, it's a good example of the multifaceted nature of game development, right? A good character controller is a synergy between level design, game feel and robust collision resolution. Whenever one or more those areas aren't up to par... well, you may get something that controls more like a tank than a rat.
+                </p>  
+                <p>
+                    By the end I fixed the most egregious issues, but anyone who plays the game can immidiately tell the player controller kind of sucks, and that's entrirely my fault. To be honest, I would rather bury this project and never showcase it, but pretending something never happened isn't a good way to deal with just about anything. By examining our failures and learning from our mistakes we can grow to become better developers, and that's why Jim &amp; Jam belongs in my portfolio.
+                </p>
             </div>
             
         </div>
