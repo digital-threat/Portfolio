@@ -31,20 +31,20 @@
         <div class="content">
             <div id="first-block">
                 <div id="project-overview">
-                    <div id="project-info">
-                        <h3>Project Info</h3>
-                        <p style="margin-top: 15px;">Role: Lead Programmer, Gameplay Programmer</p>
-                        <p style="margin-top: 10px;">Team Size: 14</p>
-                        <p style="margin-top: 10px;">Duration: 3 weeks</p>
-                        <p style="margin-top: 10px;">Engine: Unity</p>
+                    <div class="grid-item" style="margin-top: 0;">
+                        <h3 class="section-title">Project Info</h3>
+                        <p>Role: Lead Programmer, Gameplay Programmer</p>
+                        <p style="margin-top: 5px;">Team Size: 14</p>
+                        <p style="margin-top: 5px;">Duration: 3 weeks</p>
+                        <p style="margin-top: 5px;">Engine: Unity</p>
                     </div>
 
-                    <div id="project-desc">
-                        <h3>Escape the rapidly flooding sewer!</h3>
-                        <p style="margin-top: 15px; line-height: 1.15rem;">
+                    <div class="grid-item" style="margin-top: 0;">
+                        <h3 class="section-title">Escape the rapidly flooding sewer!</h3>
+                        <p>
                             You play as Jim, an ordinary sewer rat that has grown up and spent their whole life in the sewers with their rat friend, Jam, when the sewer they've always called home suddenly floods!
                         </p>
-                        <p style="margin-top: 10px; line-height: 1.15rem;">
+                        <p style="margin-top: 10px;">
                             Hurry up and escape by scaling the walls, use sewer pipes and debris to ascend from the depths, and reunite with your rat friend before the water swallows you!
                         </p>
                     </div>
@@ -56,12 +56,14 @@
             </div>
             
             
-            <div id="second-block">
-                <h3>Character, Camera, Controls</h3>
+            <div class="grid-item">
+                <h3 class="section-title">Character, Camera, Controls</h3>
                 <p>
-                    My primary responsibility on the project was to create a player controller with an orbiting camera. I began by implementing a state machine to encapsulate different player states, such as jumping, sprinting and falling. To have more precise control over movement, I chose to work with a kinematic controller rather than a physics based one. I used Unity's built-in character controller as a base, but soon found myself dealing with a number of issues stemming from the limitations of the built-in controller. Jim would fly up into the air instead of stepping on a ledge, or hang on a ledge in a falling state, or slighly climb slopes that should be too steep, etc. I'd fix one thing only to find something else broke instead. Realizing I'm not making progress, I re-priorized my workload and focused on the most important tasks. One such task was implementing the ability to slide down steep slopes which was essential due to the abundance of round pipes in the game. I implemented it by casting a grid of rays down at the surface, then checking whether the surface angle for all hits is a stable slope. If it isn't stable, I add an additional downward force and project the velocity onto the slope.  
+                    My primary responsibility on the project was to create a player controller. I began by implementing a state machine to encapsulate different player states, such as jumping, sprinting and falling. To have more precise control over movement, I chose to work with a kinematic controller rather than a physics based one. I used Unity's built-in character controller as a base, but soon found myself dealing with a number of issues stemming from the limitations of the built-in controller. Jim would fly up into the air instead of stepping on a ledge, or hang on a ledge in a falling state, or slighly climb slopes that should be too steep. Working on Jim &amp; Jam has taught me much about the inherent complexity of character controllers. A good character controller is a synergy between level design, game feel and robust collision resolution. Whenever one or more of those areas aren't up to par... well, you may get something that controls more like a tank than a rat. Toward the end of the project I had to re-priorized my workload and focused on the most important tasks. One such task was implementing the ability to slide down steep slopes which was essential due to the abundance of round pipes in the game. I implemented it by casting a grid of rays down at the surface, then checking whether the surface angle for all hits is a stable slope. If it isn't stable, I add an additional downward force and project the velocity onto the slope.  
                 </p>
+            </div>
             
+            <div class="grid-item">
                 <details>
                     <summary>Code - Sliding</summary>
                     <pre class="code-snippet">
@@ -119,10 +121,10 @@
         {
             int hits = Physics.RaycastNonAlloc(ray, slideCheckHits, slideRayLength, mask);
 
-            for (int i = 0; i < hits; i++)
+            for (int i = 0; i &lt; hits; i++)
             {
                 float dot = Vector3.Dot(Vector3.up, slideCheckHits[i].normal);
-                if (dot < Mathf.Cos(slopeLimit * Mathf.Deg2Rad))
+                if (dot &lt; Mathf.Cos(slopeLimit * Mathf.Deg2Rad))
                 {
                     slideNormal = slideCheckHits[i].normal;
                     return true;
@@ -137,30 +139,13 @@
                 </details>
             </div>
                 
-            <div id="lr">
-                <h3>Leadership Role</h3>
-                <p>Text</p>
+            <div class="grid-item">
+                <h3 class="section-title">Lead Role</h3>
+                <p>On this project I also took on a role of lead programmer for the first time. It was a good opportunity to try out a lead role because of the short duration of the project and the fact that there were only 2 other programmers beside me, so it wasn't a huge responsibility. My duties as a lead included facilitating communication between programmers and other departments on the team as well as assisting with defining and distributing tasks. I also conducted multiple code reviews. Overall it was a good learning experience and I got to reflect on what my strengths and weaknesses are when it comes to working in a lead position on a larger team.</p>
             </div>
-            
-            
-            <div id="ffs">
-                <h3>Fail, Fail, Succeed</h3>
-                <p>
-                    Working on Jim &amp; Jam has taught me much about the inherent complexity of character controllers. Thinking about it, it's a good example of the multifaceted nature of game development, right? A good character controller is a synergy between level design, game feel and robust collision resolution. Whenever one or more those areas aren't up to par... well, you may get something that controls more like a tank than a rat.
-                </p>  
-                <p>
-                    By the end I fixed the most egregious issues, but anyone who plays the game can immidiately tell the player controller kind of sucks, and that's entrirely my fault. To be honest, I would rather bury this project and never showcase it, but pretending something never happened isn't a good way to deal with just about anything. By examining our failures and learning from our mistakes we can grow to become better developers, and that's why Jim &amp; Jam belongs in my portfolio.
-                </p>
-            </div>
-            
         </div>
 
         <footer>
-            <small>Made by myself with absolutely zero knowledge of</small>
-            <small id="rainbow-1">H</small><small id="rainbow-2">T</small><small id="rainbow-3">M</small><small id="rainbow-4">L</small>
-            <small>&</small>
-            <small id="rainbow-5">C</small><small id="rainbow-6">S</small><small id="rainbow-7">S</small>
-            <small>figuring it out on the go.</small>
         </footer>
     </body>
 </html>

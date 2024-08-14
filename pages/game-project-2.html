@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Sergei Grigorev</title>
+        <link rel="stylesheet" href="/styles/main.css">
+        <link rel="stylesheet" href="/styles/project.css">
+        <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <h1 class="title">Sergei Grigorev</h1>
+                <h3 class="subtitle">Game Programmer</h3>
+            </div>
+            
+            <nav>
+                <a href="/index.html">Portfolio</a>
+                <a href="about.html">About</a>
+                <a href="/assets/Sergei_Grigorev_CV.pdf" target="_blank">CV</a>
+            </nav>
+        </header>
+
+        <h2>Paddle Panic</h2>
+        <h3 id="game-subtitle">Game Project 2 (Futuregames)</h3>
+        
+        <div class="content">
+            <div id="first-block">
+                <div id="project-overview">
+                    <div class="grid-item" style="margin-top: 0;">
+                        <h3 class="section-title">Project Info</h3>
+                        <p>Role: Gameplay Programmer, Tech Art</p>
+                        <p style="margin-top: 5px;">Team Size: 15</p>
+                        <p style="margin-top: 5px;">Duration: 4 weeks</p>
+                        <p style="margin-top: 5px;">Engine: Unity</p>
+                    </div>
+
+                    <div class="grid-item" style="margin-top: 0;">
+                        <h3 class="section-title">Grab your paddle and prepare for an adventure!</h3>
+                        <p>
+                            Dive into the heart-pounding adrenaline rush of Paddle Panic, an exhilarating 3rd person extreme rafting Co-Op phone game that will test your teamwork and coordination! Join forces with a friend as you navigate treacherous white waters, each of you controlling a paddle to steer your raft to safety.
+                        </p>
+                    </div>
+                </div>
+            
+                <div id="trailer">
+                    <iframe class="media" width="640" height="360" src="https://www.youtube-nocookie.com/embed/dKOPEOl-oMg?si=D6gAn07_azBxQZMw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            
+            <div class="grid-item">
+                <h3 class="section-title">Scoring System</h3>
+                <p>
+                    One of my main tasks on the project was to create a scoring system. For that purpose I implemented multiple components to gather statistics about player's performance and a simple equation to calculate the final score and award "stars" (an indicator of performance and a currency used to purchase customization). The final score is calculated as a sum of base score, time score and checkpoint score. Base score is given for completing a level and can be customized by a designer on a per-level basis. Time score is, as implied by the name, based on the time it took the player to complete the level. The system lets the designer set a reference time and maximum time score. Player's time score decreases for every second the player loses compared to the reference time. The last part is the checkpoint score. I created checkpoint gates which are placed manually in the level. Upon passing the checkpoint the player gets a set amount of score.
+                </p>
+            </div>
+            
+            <div class="grid-item">
+                <details>
+                    <summary>Code - Scoring System</summary>
+                    <pre class="code-snippet">
+                        <code>
+public class RaceResults : MonoBehaviour
+{
+    [SerializeField] private RaceTimer timer;
+    [SerializeField] private CheckpointScore checkpointScore;
+    
+    [SerializeField] private List&lt;Star&gt; starTiers;
+    [SerializeField] private int baseScore = 1000;
+    [SerializeField] private PerfectTime perfectTime;
+    [SerializeField] private int scoreLostPerSec;
+    
+    public RaceData GetResults()
+    {
+        RaceData raceData;
+
+        raceData.time = GetTime();
+        raceData.score = GetScore();
+        raceData.stars = GetStars(raceData.score);
+        
+        Debug.Log($"Time: {raceData.time}");
+        Debug.Log($"Score: {raceData.score}");
+        Debug.Log($"Stars: {raceData.stars}");
+
+        
+        return raceData;
+    }
+
+    private string GetTime()
+    {
+        return timer.Formatted;
+    }
+
+    private int GetScore()
+    {
+        int timeDelta = Mathf.Min(timer.Raw - perfectTime.Raw, 0);
+        int timeScore = perfectTime.score - (timeDelta * scoreLostPerSec);
+        int totalScore = baseScore + checkpointScore.GetScore() + timeScore;
+
+        return totalScore;
+    }
+
+    private int GetStars(int score)
+    {
+        for (int i = starTiers.Count; i > -1; i--)
+        {
+            if (score >= starTiers[i-1].score)
+                return i;
+        }
+
+        return 0;
+    }
+}
+                        </code>
+                    </pre>  
+                </details>
+            </div>
+            <div class="grid-item">
+                <h3 class="section-title">Bits of Tech Art</h3>
+                <p>
+                    Besides the scoring system, I've also laid my hands on some tech art adjacent tasks. I made a speed lines shader which is implemented as a render feature and fades in and out based on player's speed. I've also worked on the transition in and out of the cave present in one of the levels. To invoke a feeling of rafting inside a dark cave, we needed to create some artificial source of darkness as the cave was way too bright with normal lighting. The tricky part is that the cave has to be consisntently dark when viewed both from inside and outside. I tried an approach which involved placing a quad with a custom depth-based "darkness" shader in the mouth of the cave that switches to screen-space "darkness" when the gameplay camera collides with the quad. It was hard to line up the switch exactly though, so instead I asked the level designer to place a bend at the beginning of the cave to hide that the cave isn't dark when viewed from the outside. When the player enters the cave, multiple lighting and fog parameters are interpolated over time to create a gentle transition.
+                </p>  
+            </div>
+            
+        </div>
+
+        <footer>
+        </footer>
+    </body>
+</html>
