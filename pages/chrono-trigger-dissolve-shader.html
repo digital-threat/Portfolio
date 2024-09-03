@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Sergei Grigorev</title>
+        <link rel="stylesheet" href="/styles/main.css">
+        <link rel="stylesheet" href="/styles/project.css">
+        <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <h1 class="title">Sergei Grigorev</h1>
+                <h3 class="subtitle">Game Programmer</h3>
+            </div>
+            
+            <nav>
+                <a href="/index.html">Portfolio</a>
+                <a href="about.html">About</a>
+                <a href="/assets/CV.pdf" target="_blank">CV</a>
+            </nav>
+        </header>
+
+        <h2>Chrono Trigger - Dissolve Shader</h2>
+        <h3 id="game-subtitle">Shader Study</h3>
+        
+        <div class="content">
+            <div id="first-block">
+                <div id="project-overview">
+                    <div class="grid-item" style="margin-top: 0;">
+                        <h3 class="section-title">Project Info</h3>
+                        <p style="margin-top: 5px;">Team Size: Solo</p>
+                        <p style="margin-top: 5px;">Duration: 1 day</p>
+                        <p style="margin-top: 5px;">Engine: Godot</p>
+                        <p style="margin-top: 5px;">Language: Godot Shading language</p>
+                    </div>
+
+                    <div class="grid-item" style="margin-top: 0;">
+                        <h3 class="section-title">Grab your paddle and prepare for an adventure!</h3>
+                        <p>
+                            Dive into the heart-pounding adrenaline rush of Paddle Panic, an exhilarating 3rd person extreme rafting Co-Op phone game that will test your teamwork and coordination! Join forces with a friend as you navigate treacherous white waters, each of you controlling a paddle to steer your raft to safety.
+                        </p>
+                    </div>
+                </div>
+            
+                <div id="trailer">
+                    <iframe class="media" width="640" height="360" src="https://www.youtube-nocookie.com/embed/dKOPEOl-oMg?si=D6gAn07_azBxQZMw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            
+            <div class="grid-item">
+                <h3 class="section-title">Reverse Engineering on Paper</h3>
+                <p>
+                    One of my main tasks on the project was to create a scoring system. For that purpose I implemented multiple components to gather statistics about player's performance and a simple equation to calculate the final score and award "stars" (an indicator of performance and a currency used to purchase customization). The final score is calculated as a sum of base score, time score and checkpoint score. Base score is given for completing a level and can be customized by a designer on a per-level basis. Time score is, as implied by the name, based on the time it took the player to complete the level. The system lets the designer set a reference time and maximum time score. Player's time score decreases for every second the player loses compared to the reference time. The last part is the checkpoint score. I created checkpoint gates which are placed manually in the level. Upon passing the checkpoint the player gets a set amount of score.
+                </p>
+            </div>
+            
+            <div class="grid-item">
+                <details>
+                    <summary>Code - Dissolve Shader</summary>
+                    <pre class="code-snippet">
+                        <code>
+shader_type canvas_item;
+
+uniform float _Opacity;
+uniform sampler2D _DissolveTexture;
+
+float dissolve(vec2 uv, float opacity)
+{
+	vec2 size = vec2(textureSize(_DissolveTexture, 0));
+	float mask = texture(_DissolveTexture, mod(uv, size) / size).x;
+	return step(mask, opacity);
+}
+
+void fragment()
+{
+	COLOR = texture(TEXTURE, UV);
+	COLOR.r += 1.0 - _Opacity;
+	COLOR *= dissolve(UV / TEXTURE_PIXEL_SIZE, _Opacity);
+}
+                        </code>
+                    </pre>  
+                </details>
+            </div>
+            <div class="grid-item">
+                <details>
+                    <summary>Credit</summary>
+                    <p>Dragon sprites - Stephen "Redshrike" Challener, MrBeast, Surt, Blarumyrran, Sharm, Zabin</p>
+                </details>
+            </div> 
+        </div>
+
+        <footer>
+        </footer>
+    </body>
+</html>
