@@ -1,6 +1,7 @@
-const template = document.createElement("template");
-template.innerHTML = `
-    <header>
+class Header extends HTMLElement {
+    connectedCallback() {
+        this.innerHTML = `
+<header>
     <div class="title-bar">
         <h1>Sergei Grigorev</h1>
         <h3>Game Programmer</h3>
@@ -12,13 +13,7 @@ template.innerHTML = `
         <a href="assets/CV.pdf" target="_blank">CV</a>
     </nav>
 </header>
-`;
-
-class Header extends HTMLElement {
-    constructor() {
-        super();
-        const clone = template.content.cloneNode(true);
-        this.appendChild(clone);
+    `;
     }
 }
 
