@@ -1,44 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="../styles/main.css">
-        <title>Experimental Games | Sergei Grigorev</title>
-    </head>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#ffffff" name="theme-color">
+    <link href="../styles/main.css" rel="stylesheet">
+    <link href="../styles/project.css" rel="stylesheet">
+    <link href="../styles/experimental-games.css" rel="stylesheet">
+    <link href="../assets/favicon.ico" rel="icon" type="image/x-icon">
+    <title>Experimental Games | Sergei Grigorev</title>
+    <script src="../js/header.js"></script>
+</head>
 
-    <body>
-        <header class="container">
-            <div class="title">
-                <h1>Sergei Grigorev</h1>
-                <h3>Portfolio</h3>  
-            </div>
-            
-            <nav>
-                <a href="index.html">Portfolio</a>
-                <a href="pages/about.html">About</a>
-                <a href="/assets/CV.pdf" target="_blank">CV</a>
-            </nav>
-        </header>
+<body>
+<div class="container">
+    <header-component></header-component>
 
-        <section class="container">
+    <div class="content">
+        <div>
             <h2>Experimental Games</h2>
-            <p>In February-March 2023 I developed 4 digital games as part of the 'Experimental Game Design' course in a team with 2 other students. Each game was developed in 2 weeks and explores a different theme.</p>
-            <h3>Frog Choir</h3>
-            <h4>Theme: Game & Watch</h4>
-            <div class = "project_info">
-                <p>Year: 2023</p>
-                <p>Engine: Unity</p>
-                <p>Time: 2 weeks (20h/week)</p>
-                <p>Team Size: 3</p>
-                <p>Role: Original Idea, Programmer (Solo), Designer</p>
+            <div>
+                <p style="display: inline;">In my last semester at Uppsala University I took a course called</p>
+                <p style="display: inline;font-weight: 600">Experimental Game Design</p>
+                <p style="display: inline;">during which I developed 4
+                    digital games in a team with 2 other students. I was the only programmer on the team, all code is written by me.
+                    Each
+                    game was developed in 2 weeks based on a theme that was set by the teacher. I'm increadibly thankful to have had
+                    Cedric
+                    le Therisien and Oliver Linke as my teammates, who agreed to follow my ideas for the first
+                    3 games and co-designed them with me into a coherent whole.</p>
             </div>
-            <p>Frog choir is made in the style of Game & Watch. You play as a choir conductor that must keep the frog choir from going off pitch. The better you are able to keep the frogs on pitch, the larger the audience and your high score.</p>
-            <h4>Comments:</h4>
-            <p>Originally, I envisioned each frog would have a different voice register (soprano, alto, etc.) as well as have different singing parts. Like a real choir! We weren’t quite able to realize that idea in reality and I still wonder how the choir would sound if we did.</p>
-        </section>
+            <ul class="badge-list">
+                <li class="badge">2023</li>
+                <li class="badge">Uppsala University</li>
+                <li class="badge">Unity</li>
+                <li class="badge">C#</li>
+                <li class="badge">Team Size: 3</li>
+                <li class="badge">Gameplay Programmer</li>
+                <li class="badge">Lead Designer</li>
+            </ul>
+        </div>
 
-        <footer class="container">
-            <small>Made by myself with a little knowledge of HTML and CSS</small>
-        </footer>
-    </body>
+
+        <div>
+            <div class="project-overview">
+                <div class="project-description">
+                    <h3>Frog Choir</h3>
+                    <div>
+                        <p>Year: 2023</p>
+                        <p>Engine: Unity</p>
+                        <p>Duration: 2 weeks</p>
+                        <p>Team Size: 3</p>
+                        <p>Role: Programmer, designer</p>
+                    </div>
+                    <p>Frog choir is made in the style of Game & Watch. You play as a choir conductor that must keep the frog choir
+                        from going off pitch. The better you are able to keep the frogs on pitch, the larger the audience and your
+                        high score.</p>
+                </div>
+                <div class="trailer-container">
+                    <video autoplay class="trailer" height="360" loop muted width="640">
+                        <source src="../assets/videos/frog-choir.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <h4>Comments:</h4>
+            <p>Originally, I envisioned each frog would have a different voice register (soprano, alto, etc.) as well as have different
+                singing
+                parts. Like a real choir! We werenï¿½t quite able to realize that idea in reality and I still wonder how the choir would
+                sound if
+                we did.</p>
+        </div>
+
+        <div>
+            <div class="project-overview">
+                <div class="project-description">
+                    <h3>A Moderately Suspicious Dungeon Crawler</h3>
+                    <div>
+                        <p>Year: 2023</p>
+                        <p>Engine: Unity</p>
+                        <p>Duration: 2 weeks</p>
+                        <p>Team Size: 3</p>
+                        <p>Role: Programmer, designer</p>
+                    </div>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                        consequat.</p>
+                </div>
+                <div class="trailer-container">
+                    <video autoplay class="trailer" height="360" loop muted width="640">
+                        <source src="../assets/videos/amsdc.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <h4>Comments:</h4>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+                aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+
+        <div>
+            <div class="project-overview">
+                <div class="project-description">
+                    <h3>Pulse Puncher</h3>
+                    <div>
+                        <p>Year: 2023</p>
+                        <p>Engine: Unity</p>
+                        <p>Duration: 2 weeks</p>
+                        <p>Team Size: 3</p>
+                        <p>Role: Programmer, designer</p>
+                    </div>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                        consequat.</p>
+                </div>
+                <div class="trailer-container">
+                    <video autoplay class="trailer" height="360" loop muted width="640">
+                        <source src="../assets/videos/pulse-puncher.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <h4>Comments:</h4>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+                aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+
+        <div>
+            <div class="project-overview">
+                <div class="project-description">
+                    <h3>Chase to the End: Shrimps in Space</h3>
+                    <div>
+                        <p>Year: 2023</p>
+                        <p>Engine: Unity</p>
+                        <p>Duration: 2 weeks</p>
+                        <p>Team Size: 3</p>
+                        <p>Role: Programmer, designer</p>
+                    </div>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                        consequat.</p>
+                </div>
+                <div class="trailer-container">
+                    <video autoplay class="trailer" height="360" loop muted width="640">
+                        <source src="../assets/videos/shrimps-in-space.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <h4>Comments:</h4>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+                aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+
+    </div>
+
+    <footer class="container">
+        <small>Made by myself with a little knowledge of HTML and CSS</small>
+    </footer>
+</div>
+</body>
 </html>

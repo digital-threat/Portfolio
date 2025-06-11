@@ -1,54 +1,43 @@
 .content {
-    display: grid;
-    grid-template-columns: 1fr;
-    column-gap: 16px;
-    margin-top: 30px
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
-.media {
-    border-radius: 2px;
-    width: 100%;
-    height: 100%;
+.project-overview {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 2rem;
 }
 
-.code-snippet {
-    line-height: 1.3rem;
-    margin-left: 30px;
+.project-description {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    flex: 1;
 }
 
-.grid-item {
-    background-color: #000A2E;
-    border-radius: 2px;
-    padding: 15px 20px;
-    margin-top: 10px;
-    line-height: 1.15rem;
+.trailer-container {
+    flex: 2;
 }
 
-.section-title {
-    margin-bottom: 15px;
+.trailer {
+    border-radius: 1%;
+    max-width: 100%;
+    height: auto;
 }
 
-/* IDs */
-
-#game-subtitle {
-    font-size: 1.15rem;
+.badge-list {
+    display: flex;
+    padding: 1rem 0;
 }
 
-#first-block {
-    display: grid;
-    grid-template-columns: 1fr 1.75fr;
-    column-gap: 16px;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-#project-overview {
-    display: grid;
-    grid-row-gap: 20px;
-    align-content: space-between;
-}
-
-#trailer {
-    width: 100%;
-    height: 100%;
+.badge {
+    padding: 0.4rem;
+    margin: 0 0.25rem;
+    border-style: solid;
+    border-color: #454545;
+    border-width: 0.1em;
+    border-radius: 0.5em;
 }

@@ -130,13 +130,23 @@ h1 {
 }
 
 h2 {
-    font-size: 2rem;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
 }
 
 h3 {
-    font-size: 1.2rem;
+    font-weight: 500;
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+p {
+    font-size: 1.1rem;
 }
 
 a {
@@ -173,19 +183,6 @@ a:active {
     padding: 2rem;
 }
 
-.title-bar {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.about {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-}
-
 #about-photo {
     border-radius: 50%;
 }
@@ -194,11 +191,6 @@ a:active {
     font-size: 1.25rem;
 }
 
-.title {
-}
-
-.subtitle {
-}
 
 .featured-container {
     display: grid;
@@ -207,18 +199,6 @@ a:active {
 }
 
 .featured-item {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.archive-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    column-gap: 16px;
-}
-
-.archive-item {
     margin-top: 20px;
     margin-bottom: 20px;
     text-align: center;
@@ -247,41 +227,4 @@ a:active {
 
 .grid-text:active {
     opacity: 1;
-}
-
-/* IDs */
-
-#introduction {
-    font-size: 1.5rem;
-    text-align: center;
-    margin-top: 40px;
-    margin-bottom: 40px;
-}
-
-#rainbow-1 {
-    color: red;
-}
-
-#rainbow-2 {
-    color: orange;
-}
-
-#rainbow-3 {
-    color: yellow;
-}
-
-#rainbow-4 {
-    color: green;
-}
-
-#rainbow-5 {
-    color: blue;
-}
-
-#rainbow-6 {
-    color: indigo;
-}
-
-#rainbow-7 {
-    color: violet;
 }
