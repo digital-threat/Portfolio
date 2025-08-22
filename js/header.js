@@ -8,9 +8,9 @@ class Header extends HTMLElement {
     </div>
 
     <nav>
-        <a href="index.html">Home</a>
-        <a href="pages/about.html">About</a>
-        <a href="assets/CV.pdf" target="_blank">CV</a>
+        <a href="/index.html">Home</a>
+        <a href="/pages/about.html">About</a>
+        <a href="/assets/CV.pdf" target="_blank">CV</a>
     </nav>
 </header>
     `;
