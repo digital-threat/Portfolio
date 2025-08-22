@@ -151,6 +151,7 @@ h4 {
 
 p {
     font-size: 1.1rem;
+    line-height: 1.4;
 }
 
 a {
@@ -188,6 +189,12 @@ a:active {
 .container {
     max-width: 1000px;
     padding: 2rem;
+}
+
+.title-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .project-container {
@@ -239,9 +246,12 @@ a:active {
 
 #about-text {
     text-align: justify;
-    line-height: 1.25;
     font-size: 1.25rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+}
+
+#about-text p {
+    line-height: 1.25;
 }
