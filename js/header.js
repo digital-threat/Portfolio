@@ -4,7 +4,7 @@ class Header extends HTMLElement {
 <header>
     <div class="title-bar">
         <h1>Sergei Grigorev</h1>
-        <h3>Game Developer</h3>
+        <h3>Gameplay Programmer</h3>
     </div>
 
     <nav>

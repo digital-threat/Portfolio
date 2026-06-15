@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#ffffff" name="theme-color">
+    <link href="../styles/main.css" rel="stylesheet">
+    <link href="../styles/project.css" rel="stylesheet">
+    <link href="../styles/experimental-games.css" rel="stylesheet">
+    <title>Visibility Detection | Sergei Grigorev</title>
+    <link href="https://sergeigrigorev.com/" rel="canonical">
+    <script src="../js/header.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <header-component></header-component>
+
+    <div class="content">
+        <div>
+            <h2>99% Visible: Visibility detection system in "A Search For a Shiny Thing"</h2>
+            <h3>Introduction</h3>
+            <div>
+                <p>From 2024 to 2026 I worked on a photography adventure game titled "A Search for a Shiny Thing", a project that is now unfortunately placed on indefinite pause. From the outset, we knew that photography would be the most important system to get right, and we set out to create a system with a lot more depth than any of the existing photography games on the market.
+                    One of the core pillars of this system is *accuracy*, and how I managed to make this pillar a reality is what I will be talking about in this article.
+                </p>
+                <div class="project-image">
+                    <img alt="Placeholder Logo" src="../assets/images/asfast_logo.png"/>
+                </div>
+            </div>
+            <h3>The Problem</h3>
+            <p>Implement a visibility detection system that can blah blah blah</p>
+            <div class="project-image">
+                <img alt="Result Showcase" src="../assets/images/asfast_visibility_result_showcase.png"/>
+            </div>
+            <h3>Typical Implementation</h3>
+            <p>You may have stumbled upon this <a href="https://www.youtube.com/shorts/2EL2MVgVrso">viral short</a> by Gdquest that explains a typical approach of implementing AI sight perception. You simply shoot a bunch of rays and count how many of them hit target without being occluded by something between enemy and player. It works great for some genres, like stealth games, but photography games can be more complicated. Depending on how many photographable objects you have, it may be detrimental to performance to check every one of them for visibility. You have to first perform some sort broadphase cull, it can be frustum culling or a spacial partitioning system. Given that your game is 3D and you don't have a complicated occlusion culling system, you'd then do your raycasting on a narrow set of relevant objects.</p>
+            <div class="project-image">
+                <img alt="Detection in Splinter Cell" src="../assets/images/blacklist_detection.png"/>
+            </div>
+            <p>For what we had in mind, however, we needed more flexibility and precision. However it's done, it must work for arbitrary shapes and we must be able to see how much of the object is visible, not just a true/false. You can achieve the former with pixel-perfect accuracy with a custom render pass (<a href="https://github.com/justonia/UnityUrpPixelPerfectVisibility">here is an example</a>), but this approach wouldn't be suitable for the latter so back to raycasting for a moment. If you have an arbitrary shape, how do you know where to shoot the rays? From a workflow perspective, manually setting up raycasting locations would be bad. I could make a tool to voxelize meshes or auto generate "skeletons" to provide raycasting targets, but is this really the best approach?
+                Performance was a concern too, not only because of the amount of rays but also collider complexity. We would want to use mesh colliders to save ourselves a lot of tedious work and they can't always be convex. I haven't profiled it, but it could potetnially be quite expensive. The only thing left to do was to invent something new.</p>
+            <div class="project-image">
+                <img alt="Concave vs Convex collider" src="../assets/images/asfast_mesh_colliders.png"/>
+            </div>
+            <h3>The Solution</h3>
+            <p>There must be a way to do this on the GPU, I thought. When we're talking about quantifiying how much of the object is visible we are essentially talking about the visible surface area. How do we calculate the surface area of an arbitrary 3D object? Well, we can calculate the surface area of each triangle, but how do we know which triangles are visible? Let's put a pin on triangles and talk about it at the end of the article. What if we convert the problem from 3D to 2D? That's essentially what UV mapping is. You take the 3D model's surface and convert it to a 2D plane, which can be rendered as a texture, providing us with a reference point of what 100% visibility is. The problem of frustum and occlusion culling is already solved by the GPU, it already renders only the visible fragments. All that remains is to write which fragments are visible to a texture and compare it with the reference. Luckily, since shader model 5, it's possible to write to a UAV (unordered access view, i.e. random read/write) texture from a fragment shader. As for comparing it with a reference, that can be done using a compute shader which we can dispatch in a custom render pass and request to read the results asynchronously.</p>
+            <div class="project-image">
+                <img alt="Prototype Showcase" src="../assets/images/asfast_visibility_prototype.gif"/>
+            </div>
+            <h3>Quirks, Growth and Scaling</h3>
+            <h3>Future Work</h3>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
