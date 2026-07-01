@@ -18,10 +18,10 @@
 
     <div class="content">
         <div>
-            <h2>99% Visible: Visibility detection system in "A Search For a Shiny Thing"</h2>
+            <h2>99% Visible: Photography System in "A Search For a Shiny Thing"</h2>
             <h3>Introduction</h3>
             <div>
-                <p>From 2024 to 2026 I worked on a photography adventure game titled "A Search for a Shiny Thing", a project that is now unfortunately placed on indefinite pause. From the outset, we knew that photography would be the most important system to get right, and we set out to create a system with a lot more depth than any of the existing photography games on the market.
+                <p>From 2024 to 2026 I worked on a photography adventure game titled "A Search for a Shiny Thing", a project that is now unfortunately placed on indefinite pause. From the outset, we knew that photography would be the most important system to get right, and we set out to create a system with a lot more depth than any of the existing photography games on the market. In this article, I will break down one particular aspect of the system - visibility detection.
                     One of the core pillars of this system is *accuracy*, and how I managed to make this pillar a reality is what I will be talking about in this article.
                 </p>
                 <div class="project-image">
@@ -29,7 +29,7 @@
                 </div>
             </div>
             <h3>The Problem</h3>
-            <p>Implement a visibility detection system that can blah blah blah</p>
+            <p>The purpose of the visibility system in ths context and in it's basic form is to determine which objects are visibile inside the frame of a photo camera. However, a simple true or false is very limiting, taking a good photograph is more than just an object existing in the frame. In real photography you have to think about lighting, focus, composition, etc. While realism had never been a priority, we want to create a system with depth that players would have fun playing around with. Something that would encourage them to take good photographs, not just something that ticks a box. We had never planned on implementing a scoring system because we wanted to focus on player interpretation, but in our game players can take on quests which require handing in a photograph to complete. When you hand in a photograph we evaluate it to determine if it's suitable to complete the quest. We wanted to evaluate how much of the object is visible in the frame, how well lit it is and whether it's in focus. But how do you actually accomplish that?</p>
             <div class="project-image">
                 <img alt="Result Showcase" src="../assets/images/asfast_visibility_result_showcase.png"/>
             </div>
@@ -48,8 +48,31 @@
             <div class="project-image">
                 <img alt="Prototype Showcase" src="../assets/images/asfast_visibility_prototype.gif"/>
             </div>
+
+            <p>This is what the fragment shader looks like, simplified. I didn't include the lengthy section of code that deals with lighting calculations, including calculating lambertian diffuse and sampling baked lighting. Ideally, I would simply take a linear mesaure of how lit the object is, but it's more complicated if you account for baked lighting because it can be colored. To resolve that issue, I conver the linear RGB color to luminance, and then to percieved lightnightss (CIELAB L*). The last step is optional, but it makes the lightness measure appear more correct to human eyes. Calculating focus is simpler, using Unity's depth of field post-processing feature you can directly sample the circle of confusion texture. The value needs to be remapped because Unity encodes 0.5 as being most in focus, and 0 and 1 represent full near and far blur respectively.</p>
+
+           <pre class="code-block"><code><span class="type">RWTexture2D</span>&lt;<span class="type">float2</span>&gt; <span class="variable">output;</span>
+
+<span class="attribute">[earlydepthstencil]</span>
+<span class="type">float3</span> <span class="function">frag</span>(v2f i) <span class="operator">:</span> SV_Target
+{
+    <span class="comment">...</span>
+
+    <span class="type">float</span> <span class="variable">lightness</span> = <span class="function">ColorToLStar</span>(color);
+    <span class="type">float</span> <span class="variable">focus</span> = <span class="function">SampleCoCTexture</span>(i.positionNDC.xy / i.positionNDC.w);
+
+    <span class="type">float2</span> <span class="variable">pixelUV</span> = i.uv * _ReferenceSize;
+    <span class="variable">output</span>[pixelUV.xy] = <span class="function">float2</span>(lightness, focus);
+
+    <span class="comment">// return debug color</span>
+}</code></pre>
+
             <h3>Quirks, Growth and Scaling</h3>
+            <h4>Challenge #1: Early-Z</h4>
+            <p>You may have spotted a curious [earlydepthstencil] in the code above, which is included for a reason. Early on when I was protyping the visibility system I ran into a difficult bug. When I checked the output texture I could see that fragments that shouldn't be visible were being rendered, which put the whole idea in doubt. If I looked at an object from a perspecive where one part of the object obscured another part of the object for whatever reason I could still see the fragments that should've been discarded in a early-z test still being rendered. If you've done some graphics programming, you might know that writing to depth disables early-z. That makes sense because the GPU can't know for sure if the depth value is going to remain the same. Well, as it turns out, for whatever reason if you write to UAV texture early-z is also gets disabled by default. I couldn't find out why it happens (it was difficult enough to discover what's going on in the first place), so if you know please let me know. Thankfully, there is an attribute that allows you to force early depth-stencil testing. I doubt it's looking good for porting ASFAST to different platforms at this point, but this solves the issue.</p>
+            <h4>Challenge #2: Performance/Scale</h4>
             <h3>Future Work</h3>
+            <p>While the photography system has been battle tested in internal and external playtests, it's by no means fully complete and there are a lot of avenues we haven't explored yet. Evaluating the composition of a photograph is an interesting topic we haven't yet explored, but it's outside of the scope of this article. There may be a different approach to visibility detection too.</p>
         </div>
     </div>
 

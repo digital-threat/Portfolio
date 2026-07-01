@@ -41,3 +41,91 @@
     border-width: 0.1em;
     border-radius: 0.5em;
 }
+
+:root {
+    /* Visual Studio Dark */
+    --code-bg: #1e1e1e;
+    --code-text: #d4d4d4;
+
+    --code-keyword: #569cd6;
+    --code-type: #4ec9b0;
+    --code-function: #dcdcaa;
+    --code-number: #b5cea8;
+    --code-string: #ce9178;
+    --code-comment: #6a9955;
+    --code-preprocessor: #c586c0;
+    --code-attribute: #c586c0;
+    --code-variable: #9cdcfe;
+    --code-member: #9cdcfe;
+    --code-operator: #d4d4d4;
+}
+
+
+.code-block {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.6;
+}
+
+.code-block code {
+    display: block;
+    font-family:
+        Consolas,
+        "Cascadia Code",
+        "JetBrains Mono",
+        monospace;
+    font-size: 0.95rem;
+    white-space: pre;
+    tab-size: 4;
+}
+
+/* Syntax highlighting */
+
+.code-block .keyword {
+    color: var(--code-keyword);
+}
+
+.code-block .type {
+    color: var(--code-type);
+}
+
+.code-block .function {
+    color: var(--code-function);
+}
+
+.code-block .number {
+    color: var(--code-number);
+}
+
+.code-block .string {
+    color: var(--code-string);
+}
+
+.code-block .comment {
+    color: var(--code-comment);
+    font-style: italic;
+}
+
+.code-block .preprocessor {
+    color: var(--code-preprocessor);
+}
+
+.code-block .attribute {
+    color: var(--code-attribute);
+}
+
+.code-block .variable {
+    color: var(--code-variable);
+}
+
+.code-block .member {
+    color: var(--code-member);
+}
+
+.code-block .operator {
+    color: var(--code-operator);
+}
