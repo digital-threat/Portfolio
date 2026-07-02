@@ -1,8 +1,3 @@
-.content {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
 
 .project-overview {
     display: flex;
@@ -60,6 +55,26 @@
     --code-operator: #d4d4d4;
 }
 
+/* Elements */
+
+section {
+  margin-block: 2rem;
+}
+
+h3 {
+  margin-bottom: 1rem;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+ol {
+    margin-bottom: 1rem;
+}
+
+
+/* Classes */
 
 .code-block {
     background: var(--code-bg);

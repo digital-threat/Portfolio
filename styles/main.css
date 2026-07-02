@@ -54,7 +54,7 @@ table {
 }
 
 
-/* Elements */
+/* Fonts */
 
 @font-face {
     font-display: swap;
@@ -99,6 +99,8 @@ table {
 :root {
     --accent-color: lightskyblue;
 }
+
+/* Elements */
 
 body {
     font-family: "Open Sans", sans-serif;
@@ -152,6 +154,13 @@ h4 {
 p {
     font-size: 1.1rem;
     line-height: 1.4;
+}
+
+ol {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    list-style: decimal inside;
+    padding-left: 1rem;
 }
 
 a {

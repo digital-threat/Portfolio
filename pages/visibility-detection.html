@@ -6,7 +6,6 @@
     <meta content="#ffffff" name="theme-color">
     <link href="../styles/main.css" rel="stylesheet">
     <link href="../styles/project.css" rel="stylesheet">
-    <link href="../styles/experimental-games.css" rel="stylesheet">
     <title>Visibility Detection | Sergei Grigorev</title>
     <link href="https://sergeigrigorev.com/" rel="canonical">
     <script src="../js/header.js"></script>
@@ -17,39 +16,51 @@
     <header-component></header-component>
 
     <div class="content">
-        <div>
-            <h2>99% Visible: Photography System in "A Search For a Shiny Thing"</h2>
+        <h2>99% Visible: GPU-based Visibility System in &ldquo;A Search For a Shiny Thing&rdquo;</h2>
+
+        <section>
             <h3>Introduction</h3>
             <div>
-                <p>From 2024 to 2026 I worked on a photography adventure game titled "A Search for a Shiny Thing", a project that is now unfortunately placed on indefinite pause. From the outset, we knew that photography would be the most important system to get right, and we set out to create a system with a lot more depth than any of the existing photography games on the market. In this article, I will break down one particular aspect of the system - visibility detection.
-                    One of the core pillars of this system is *accuracy*, and how I managed to make this pillar a reality is what I will be talking about in this article.
-                </p>
-                <div class="project-image">
+                <p>From 2024 to 2026 I worked on a photography adventure game titled A Search for a Shiny Thing, a project that is now unfortunately placed on indefinite pause. From the outset, we knew photography will be THE unique selling point of our game and it was important to get it right. A lot of work went into it before we had a playable prototype and a lot more work still remains to be done before the game is released. While there's a lot to talk about, in this article, I'd like to break down the visibility system I developed to meet one particular design pillar of our photography system - accuracy.</p>
+                <!-- <div class="project-image">
                     <img alt="Placeholder Logo" src="../assets/images/asfast_logo.png"/>
-                </div>
+                </div> -->
             </div>
-            <h3>The Problem</h3>
-            <p>The purpose of the visibility system in ths context and in it's basic form is to determine which objects are visibile inside the frame of a photo camera. However, a simple true or false is very limiting, taking a good photograph is more than just an object existing in the frame. In real photography you have to think about lighting, focus, composition, etc. While realism had never been a priority, we want to create a system with depth that players would have fun playing around with. Something that would encourage them to take good photographs, not just something that ticks a box. We had never planned on implementing a scoring system because we wanted to focus on player interpretation, but in our game players can take on quests which require handing in a photograph to complete. When you hand in a photograph we evaluate it to determine if it's suitable to complete the quest. We wanted to evaluate how much of the object is visible in the frame, how well lit it is and whether it's in focus. But how do you actually accomplish that?</p>
-            <div class="project-image">
-                <img alt="Result Showcase" src="../assets/images/asfast_visibility_result_showcase.png"/>
-            </div>
-            <h3>Typical Implementation</h3>
-            <p>You may have stumbled upon this <a href="https://www.youtube.com/shorts/2EL2MVgVrso">viral short</a> by Gdquest that explains a typical approach of implementing AI sight perception. You simply shoot a bunch of rays and count how many of them hit target without being occluded by something between enemy and player. It works great for some genres, like stealth games, but photography games can be more complicated. Depending on how many photographable objects you have, it may be detrimental to performance to check every one of them for visibility. You have to first perform some sort broadphase cull, it can be frustum culling or a spacial partitioning system. Given that your game is 3D and you don't have a complicated occlusion culling system, you'd then do your raycasting on a narrow set of relevant objects.</p>
-            <div class="project-image">
-                <img alt="Detection in Splinter Cell" src="../assets/images/blacklist_detection.png"/>
-            </div>
-            <p>For what we had in mind, however, we needed more flexibility and precision. However it's done, it must work for arbitrary shapes and we must be able to see how much of the object is visible, not just a true/false. You can achieve the former with pixel-perfect accuracy with a custom render pass (<a href="https://github.com/justonia/UnityUrpPixelPerfectVisibility">here is an example</a>), but this approach wouldn't be suitable for the latter so back to raycasting for a moment. If you have an arbitrary shape, how do you know where to shoot the rays? From a workflow perspective, manually setting up raycasting locations would be bad. I could make a tool to voxelize meshes or auto generate "skeletons" to provide raycasting targets, but is this really the best approach?
-                Performance was a concern too, not only because of the amount of rays but also collider complexity. We would want to use mesh colliders to save ourselves a lot of tedious work and they can't always be convex. I haven't profiled it, but it could potetnially be quite expensive. The only thing left to do was to invent something new.</p>
-            <div class="project-image">
-                <img alt="Concave vs Convex collider" src="../assets/images/asfast_mesh_colliders.png"/>
-            </div>
-            <h3>The Solution</h3>
-            <p>There must be a way to do this on the GPU, I thought. When we're talking about quantifiying how much of the object is visible we are essentially talking about the visible surface area. How do we calculate the surface area of an arbitrary 3D object? Well, we can calculate the surface area of each triangle, but how do we know which triangles are visible? Let's put a pin on triangles and talk about it at the end of the article. What if we convert the problem from 3D to 2D? That's essentially what UV mapping is. You take the 3D model's surface and convert it to a 2D plane, which can be rendered as a texture, providing us with a reference point of what 100% visibility is. The problem of frustum and occlusion culling is already solved by the GPU, it already renders only the visible fragments. All that remains is to write which fragments are visible to a texture and compare it with the reference. Luckily, since shader model 5, it's possible to write to a UAV (unordered access view, i.e. random read/write) texture from a fragment shader. As for comparing it with a reference, that can be done using a compute shader which we can dispatch in a custom render pass and request to read the results asynchronously.</p>
-            <div class="project-image">
-                <img alt="Prototype Showcase" src="../assets/images/asfast_visibility_prototype.gif"/>
-            </div>
+        </section>
 
-            <p>This is what the fragment shader looks like, simplified. I didn't include the lengthy section of code that deals with lighting calculations, including calculating lambertian diffuse and sampling baked lighting. Ideally, I would simply take a linear mesaure of how lit the object is, but it's more complicated if you account for baked lighting because it can be colored. To resolve that issue, I conver the linear RGB color to luminance, and then to percieved lightnightss (CIELAB L*). The last step is optional, but it makes the lightness measure appear more correct to human eyes. Calculating focus is simpler, using Unity's depth of field post-processing feature you can directly sample the circle of confusion texture. The value needs to be remapped because Unity encodes 0.5 as being most in focus, and 0 and 1 represent full near and far blur respectively.</p>
+        <section>
+            <h3>The Problem</h3>
+            <p>Most photography games need a system to evaluate the contents of photograph. The purpose of the visibility system in ths context and in it's basic form is to determine which objects are visibile inside the frame of a photo camera and transfer that data to the photograph when it's taken. But how do you actually implement this?</p>
+            <!-- <div class="project-image">
+                <img alt="Result Showcase" src="../assets/images/asfast_visibility_result_showcase.png"/>
+            </div> -->
+            <p>Let's move away from photography for a second and think about how games implement AI sight perception. To narrow down the list of candidates, a typical implementation would perform a broad-phase cull based on NPC's field of view. For NPCs that have the player in their field of view, perform line-of-sight checks by casting rays towards visibility points on the character (for example bones) and count how many of them hit the target without being occluded by something. It works great for some genres, like stealth games, and even though photography games are a little different most of them still rely on this approach.</p>
+            <p>For our pursposes, however, this isn't good enough. For one, we wanted the system to work on many different types of objects of arbitrary shape. It can be a building like a lighthouse, a character, a graffiti on the wall, etc. It's a lot of extra manual labour, unless we come up with a system to automatically assign visibility points to objects. I could make a tool to voxelize meshes or auto generate "skeletons" to provide raycasting targets, but balancing accuracy and performance would become a big concern. It was important for us not to just tell IF the object is visible, but what % of it is visible. The point is to acknowledge to the player that they caught something on photo but that it's poorly visible.</p>
+            <p>Last but not least, the raycasting approach only solves the problem of visibility, but tells us nothing else. Taking a good photograph is more than just an object existing in the frame. In real photography you have to think about lighting, focus, composition, etc. While realism had never been a priority, we want to create a system with depth that players would have fun playing around with. It's possible to make separate systems that would calculate focus and lighting, but after some experimentation I hit upon an idea that could hit multiple birds with one stone.</p>
+            <!-- <div class="project-image">
+                <img alt="Detection in Splinter Cell" src="../assets/images/blacklist_detection.png"/>
+            </div> -->
+        </section>
+            
+        <section>
+            <h3>The Solution</h3>
+            <p>There must be a way to do this on the GPU, I thought. It has a lot of advantages, if you think about. Thanks to depth testing, the fragment shader will only render the visible fragments. Many objects can be processed in parallel. Additional information like lighting data can be accessed at the same time. What does it mean to see an object though? When we're talking about quantifiying how much of the object is visible we are essentially talking about the visible surface area. Calculating the surface area of an arbitrary shape sounds complicated, but there are a couple of ways to simplify this problem by converting it from 3D to 2D. One of those ways is UV mapping. You take the 3D model's surface and convert it to a 2D plane, which can be rendered as a texture, providing us with a reference point of what 100% visibility is. All that remains is to write which fragments are visible to a texture and compare it with the reference. Luckily, since shader model 5, it's possible to write to a UAV (unordered access view, i.e. random read/write) texture from a fragment shader. As for comparing it with a reference, that can be done using a compute shader which we can dispatch in a custom render pass and request to read the results asynchronously.</p>
+            <!-- <div class="project-image">
+                <img alt="Prototype Showcase" src="../assets/images/asfast_visibility_prototype.gif"/>
+            </div> -->
+            <p>Here is how it works step by step (simplified):</p>
+            <ol>
+                <li>An artist prepares a simplified visibility mesh with custom UV mapping and renders the UVs as a low-res texture to serve as reference.</li>
+                <li>Broad-phase culling is handled by using Unity's OnBecameVisible and OnBecameInvisible build-in messages. A photographable object adds itself to a list when visible.</li>
+                <li>Based on it's position in the list, each candidate for visibility photographable object is assigned an ID, which is passed to the GPU as a uniform.</li>
+                <li>A custom render pass sets a random write target, which is a RWTexture2DArray.</li>
+                <li>The custom render pass filters and draws every candidate photo object in a batch.</li>
+                <li>The fragment shader writes visible fragments to a slice of the texture array using it's custom UVs, the reference size and previously passed ID</li>
+                <li>The render pass dispatches a compute shader, which adds together all visible pixels for each slice of the texture array.</li>
+                <li>The render pass requests asynchronous readback from the GPU.</li>
+                <li>When the read reqeust is complete, compare currently visible pixels to maximum visible pixels and if the visibility is greater than 0 add the object to a "currently in frame" list.</li>
+            </ol>
+            <p>This is what the fragment shader looks like, simplified. I didn't include the lengthy section of code that deals with lighting calculations. Ideally, I would simply do a lambertian diffuse, but it's more complicated because I have to include baked lighting, and the light color won't always be white. To resolve that issue, I conver the linear RGB color to luminance, and then to percieved lightnightss (CIELAB L*). The last step is optional, but it makes the lightness measure appear more correct to human eyes. Calculating focus is simpler, using Unity's depth of field post-processing feature you can directly sample the circle of confusion texture. The value needs to be remapped because Unity encodes 0.5 as being most in focus, and 0 and 1 represent full near and far blur respectively.</p>
 
            <pre class="code-block"><code><span class="type">RWTexture2D</span>&lt;<span class="type">float2</span>&gt; <span class="variable">output;</span>
 
@@ -61,21 +72,26 @@
     <span class="type">float</span> <span class="variable">lightness</span> = <span class="function">ColorToLStar</span>(color);
     <span class="type">float</span> <span class="variable">focus</span> = <span class="function">SampleCoCTexture</span>(i.positionNDC.xy / i.positionNDC.w);
 
-    <span class="type">float2</span> <span class="variable">pixelUV</span> = i.uv * _ReferenceSize;
-    <span class="variable">output</span>[pixelUV.xy] = <span class="function">float2</span>(lightness, focus);
+    <span class="type">uint2</span> <span class="variable">pixel</span> = uint2(i.uv * _ReferenceSize);
+    <span class="variable">output</span>[pixel] = <span class="function">float2</span>(lightness, focus);
 
     <span class="comment">// return debug color</span>
 }</code></pre>
 
-            <h3>Quirks, Growth and Scaling</h3>
-            <h4>Challenge #1: Early-Z</h4>
-            <p>You may have spotted a curious [earlydepthstencil] in the code above, which is included for a reason. Early on when I was protyping the visibility system I ran into a difficult bug. When I checked the output texture I could see that fragments that shouldn't be visible were being rendered, which put the whole idea in doubt. If I looked at an object from a perspecive where one part of the object obscured another part of the object for whatever reason I could still see the fragments that should've been discarded in a early-z test still being rendered. If you've done some graphics programming, you might know that writing to depth disables early-z. That makes sense because the GPU can't know for sure if the depth value is going to remain the same. Well, as it turns out, for whatever reason if you write to UAV texture early-z is also gets disabled by default. I couldn't find out why it happens (it was difficult enough to discover what's going on in the first place), so if you know please let me know. Thankfully, there is an attribute that allows you to force early depth-stencil testing. I doubt it's looking good for porting ASFAST to different platforms at this point, but this solves the issue.</p>
-            <h4>Challenge #2: Performance/Scale</h4>
-            <h3>Future Work</h3>
-            <p>While the photography system has been battle tested in internal and external playtests, it's by no means fully complete and there are a lot of avenues we haven't explored yet. Evaluating the composition of a photograph is an interesting topic we haven't yet explored, but it's outside of the scope of this article. There may be a different approach to visibility detection too.</p>
-        </div>
-    </div>
+            <p>You may have spotted a curious [earlydepthstencil] in the code above, which is included for a reason. Early on when I was protyping the visibility system I ran into a difficult bug. When I checked the output texture I could see that fragments that shouldn't be visible were being rendered, which put the whole idea in doubt. If I looked at an object from a perspecive where one part of the object obscured another part of the object for whatever reason I could still see the fragments that should've been discarded in a early-z test still being rendered. If you've done some graphics programming, you might know that writing to depth disables early-z. That makes sense because the GPU can't know for sure if the depth value is going to remain the same. Well, as it turns out, for whatever reason if you write to UAV texture early-z is also gets disabled by default. I couldn't find out why it happens (it was difficult enough to discover what's going on in the first place), so if you know please let me know. Thankfully, [earlydepthstencil] attribute allows you to force early depth-stencil testing. </p>
+        </section>
+       
+        <section>
+            <h3>Conclusion</h3>
+            <p>The result is a system that can calculate with relative accuracy not only what % of the object is visible but also how well lit it is and whether it's in focus. All that in real-time and able to scale well into tens of objects and stay under 1ms cost. While the photography system has been battle tested in internal and external playtests, it's by no means fully complete and there's additions and improvements to be made before it's ready for release. Having said that, I'm quite proud of it. To my best knowledge, nobody has ever done anything like this before, which kind of made me feel like an explorer.</p>
+        </section>
 
+        <section>
+            <h3>Future Work</h3>
+            <p>There is a potential alternative approach I've been thinking about that doesn't add the additional steps of making custom UVs and exporting a reference texture. Since meshes are composed of triangles, it's trivial to calculate it's surface area. If you render the SV_PrimitiveID (assuming the order is same as on the CPU and stable across frames) into an offscreen buffer, in theory, one can then calculate the surface area of the visible triangles. No need for a UAV texture this time. My concern here would be that you'd have to iterate over hundreds of thousands of pixels, deduplicate the triangles and calculate (or look up) and sum up the surface area of each of them. Given the real-time requirement, it would be too expensive on the CPU, but if I could perform the deduplication step in a compute shader it might be a viable approach.</p>
+        </section>
+
+    </div>
 </div>
 </body>
 </html>
