@@ -45,25 +45,15 @@
             
         <section>
             <h3>The Solution</h3>
-            <p>There must be a way to do this on the GPU, I thought. It has a lot of advantages, if you think about. Thanks to depth testing, the fragment shader will only render the visible fragments. Many objects can be processed in parallel. Additional information like lighting data can be accessed at the same time. What does it mean to see an object though? When we're talking about quantifiying how much of the object is visible we are essentially talking about the visible surface area. Calculating the surface area of an arbitrary shape sounds complicated, but there are a couple of ways to simplify this problem by converting it from 3D to 2D. One of those ways is UV mapping. You take the 3D model's surface and convert it to a 2D plane, which can be rendered as a texture, providing us with a reference point of what 100% visibility is. All that remains is to write which fragments are visible to a texture and compare it with the reference. Luckily, since shader model 5, it's possible to write to a UAV (unordered access view, i.e. random read/write) texture from a fragment shader. As for comparing it with a reference, that can be done using a compute shader which we can dispatch in a custom render pass and request to read the results asynchronously.</p>
-            <!-- <div class="project-image">
-                <img alt="Prototype Showcase" src="../assets/images/asfast_visibility_prototype.gif"/>
-            </div> -->
-            <p>Here is how it works step by step (simplified):</p>
-            <ol>
-                <li>An artist prepares a simplified visibility mesh with custom UV mapping and renders the UVs as a low-res texture to serve as reference.</li>
-                <li>Broad-phase culling is handled by using Unity's OnBecameVisible and OnBecameInvisible build-in messages. A photographable object adds itself to a list when visible.</li>
-                <li>Based on it's position in the list, each candidate for visibility photographable object is assigned an ID, which is passed to the GPU as a uniform.</li>
-                <li>A custom render pass sets a random write target, which is a RWTexture2DArray.</li>
-                <li>The custom render pass filters and draws every candidate photo object in a batch.</li>
-                <li>The fragment shader writes visible fragments to a slice of the texture array using it's custom UVs, the reference size and previously passed ID</li>
-                <li>The render pass dispatches a compute shader, which adds together all visible pixels for each slice of the texture array.</li>
-                <li>The render pass requests asynchronous readback from the GPU.</li>
-                <li>When the read reqeust is complete, compare currently visible pixels to maximum visible pixels and if the visibility is greater than 0 add the object to a "currently in frame" list.</li>
-            </ol>
-            <p>This is what the fragment shader looks like, simplified. I didn't include the lengthy section of code that deals with lighting calculations. Ideally, I would simply do a lambertian diffuse, but it's more complicated because I have to include baked lighting, and the light color won't always be white. To resolve that issue, I conver the linear RGB color to luminance, and then to percieved lightnightss (CIELAB L*). The last step is optional, but it makes the lightness measure appear more correct to human eyes. Calculating focus is simpler, using Unity's depth of field post-processing feature you can directly sample the circle of confusion texture. The value needs to be remapped because Unity encodes 0.5 as being most in focus, and 0 and 1 represent full near and far blur respectively.</p>
+            <p>What does it actually mean for an object to be "seen"? Since we wanted to quantify how much of an object is visible, what we were really measuring was its visible surface area. "There has to be a way to do this on the GPU," I thought.</p>
 
-           <pre class="code-block"><code><span class="type">RWTexture2D</span>&lt;<span class="type">float2</span>&gt; <span class="variable">output;</span>
+            <p>One way to think about it is that every rendered fragment represents a patch of the object's surface. If a part of the object is outside of the frame it will be clipped during rasterization, and if it's occluded, it's eliminated by the depth test. The approach also has a naturally self-adjusting granularity: the less screen space an object occupies, the less fragments will be rendered (a limitation, but one that aligns with human perception). From a performance standpoint, the GPU offers the obvious advantage of processing many objects in parallel, if rendered in a batch.</p>
+
+            <p>That still leaves one important question: how do you correlate rendered fragments with the object's surface area? Surface area is innately a two-dimensional concept, which led me to think about UV mapping. It's a process that unwraps a 3D mesh into a 2D layout, which represents the entire surface area of the object. The UV layout can then be rendered as a texture, providing us with a reference of what 100% visibility looks like. While texel density will vary, modeling software's tools will produce sufficiently uniform results for measurement purposes. All that remains is to somehow record which fragments were rendered and compare the result with the reference.</p>
+
+            <p>Fortunately, since Shader Model 5, fragment shaders can perform random reads/writes to UAV (unordered access view) textures. Using the mesh's UV coordinates as index into the texture, each visible fragment can write information to the pixel corresponding to its position. Comparing the resulting texture against the reference is pretty straightforward and can be done in a compute shader for efficiency.</p>
+
+            <pre class="code-block"><code><span class="type">RWTexture2D</span>&lt;<span class="type">float2</span>&gt; <span class="variable">output;</span>
 
 <span class="attribute">[earlydepthstencil]</span>
 <span class="type">float3</span> <span class="function">frag</span>(v2f i) <span class="operator">:</span> SV_Target
@@ -79,7 +69,30 @@
     <span class="comment">// return debug color</span>
 }</code></pre>
 
+            <p>The fragment shader above shows the core idea.</p>
+
+            <p>With the core problem solved, we can think about other information we want to include besides visibility.</p>
+
+            <p>This is what the fragment shader looks like, simplified. I didn't include the lengthy section of code that deals with lighting calculations. Ideally, I would simply do a lambertian diffuse, but it's more complicated because I have to include baked lighting, and the light color won't always be white. To resolve that issue, I conver the linear RGB color to luminance, and then to percieved lightnightss (CIELAB L*). The last step is optional, but it makes the lightness measure appear more correct to human eyes. Calculating focus is simpler, using Unity's depth of field post-processing feature you can directly sample the circle of confusion texture. The value needs to be remapped because Unity encodes 0.5 as being most in focus, and 0 and 1 represent full near and far blur respectively.</p>
+
             <p>You may have spotted a curious [earlydepthstencil] in the code above, which is included for a reason. Early on when I was protyping the visibility system I ran into a difficult bug. When I checked the output texture I could see that fragments that shouldn't be visible were being rendered, which put the whole idea in doubt. If I looked at an object from a perspecive where one part of the object obscured another part of the object for whatever reason I could still see the fragments that should've been discarded in a early-z test still being rendered. If you've done some graphics programming, you might know that writing to depth disables early-z. That makes sense because the GPU can't know for sure if the depth value is going to remain the same. Well, as it turns out, for whatever reason if you write to UAV texture early-z is also gets disabled by default. I couldn't find out why it happens (it was difficult enough to discover what's going on in the first place), so if you know please let me know. Thankfully, [earlydepthstencil] attribute allows you to force early depth-stencil testing. </p>
+
+            <!-- <div class="project-image">
+                <img alt="Prototype Showcase" src="../assets/images/asfast_visibility_prototype.gif"/>
+            </div> -->
+
+            <p>Here is how it works step by step (simplified):</p>
+            <ol>
+                <li>An artist prepares a simplified visibility mesh with custom UV mapping and renders the UVs as a low-res texture to serve as reference.</li>
+                <li>Broad-phase culling is handled by using Unity's OnBecameVisible and OnBecameInvisible build-in messages. A photographable object adds itself to a list when visible.</li>
+                <li>Based on it's position in the list, each candidate for visibility photographable object is assigned an ID, which is passed to the GPU as a uniform.</li>
+                <li>A custom render pass sets a random write target, which is a RWTexture2DArray.</li>
+                <li>The custom render pass filters and draws every candidate photo object in a batch.</li>
+                <li>The fragment shader writes visible fragments to a slice of the texture array using it's custom UVs, the reference size and previously passed ID</li>
+                <li>The render pass dispatches a compute shader, which adds together all visible pixels for each slice of the texture array.</li>
+                <li>The render pass requests asynchronous readback from the GPU.</li>
+                <li>When the read reqeust is complete, compare currently visible pixels to maximum visible pixels and if the visibility is greater than 0 add the object to a "currently in frame" list.</li>
+            </ol>
         </section>
        
         <section>
