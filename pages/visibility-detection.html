@@ -53,6 +53,8 @@
 
             <p>Fortunately, since Shader Model 5, fragment shaders can perform random reads/writes to UAV (unordered access view) textures. Using the mesh's UV coordinates as index into the texture, each visible fragment can write information to the pixel corresponding to its position. Comparing the resulting texture against the reference is pretty straightforward and can be done in a compute shader for efficiency.</p>
 
+            <p>The fragment shader below shows the core idea.</p>
+
             <pre class="code-block"><code><span class="type">RWTexture2D</span>&lt;<span class="type">float2</span>&gt; <span class="variable">output;</span>
 
 <span class="attribute">[earlydepthstencil]</span>
@@ -69,30 +71,30 @@
     <span class="comment">// return debug color</span>
 }</code></pre>
 
-            <p>The fragment shader above shows the core idea.</p>
+            <p>Besides visibility, the output texture also encodes lightness and focus.</p>
 
-            <p>With the core problem solved, we can think about other information we want to include besides visibility.</p>
+            <p>Lightness measures how well illuminated the object is, taking into account direct sunlight, shadows, and additional lights. To compute it, I shade the fragment using a simplified version of the lighting code used in the main forward pass. It takes into account real-time ligthing (lambertian diffuse), baked lighting, and shadow maps. I convert the RGB color of the fragment to luminance and then to perceived lightness (CIELAB L*). The last step is optional, but it produces values that better match human perception.</p>
 
-            <p>This is what the fragment shader looks like, simplified. I didn't include the lengthy section of code that deals with lighting calculations. Ideally, I would simply do a lambertian diffuse, but it's more complicated because I have to include baked lighting, and the light color won't always be white. To resolve that issue, I conver the linear RGB color to luminance, and then to percieved lightnightss (CIELAB L*). The last step is optional, but it makes the lightness measure appear more correct to human eyes. Calculating focus is simpler, using Unity's depth of field post-processing feature you can directly sample the circle of confusion texture. The value needs to be remapped because Unity encodes 0.5 as being most in focus, and 0 and 1 represent full near and far blur respectively.</p>
+            <p>Focus, as you can guess, measures how far out of focus the object is. I'm using Unity's depth of field post-processing feature, which allows me to change the focus point through code and creates a globally accessible "circle of confusion" texture that can be sampled in a shader. This texture encodes 0 as maximum near blur, 1 as maximum far blur, and 0.5 as the sharpest point. I remap the value so that 0 is maximum blur and 1 is perfect focus.</p>
 
-            <p>You may have spotted a curious [earlydepthstencil] in the code above, which is included for a reason. Early on when I was protyping the visibility system I ran into a difficult bug. When I checked the output texture I could see that fragments that shouldn't be visible were being rendered, which put the whole idea in doubt. If I looked at an object from a perspecive where one part of the object obscured another part of the object for whatever reason I could still see the fragments that should've been discarded in a early-z test still being rendered. If you've done some graphics programming, you might know that writing to depth disables early-z. That makes sense because the GPU can't know for sure if the depth value is going to remain the same. Well, as it turns out, for whatever reason if you write to UAV texture early-z is also gets disabled by default. I couldn't find out why it happens (it was difficult enough to discover what's going on in the first place), so if you know please let me know. Thankfully, [earlydepthstencil] attribute allows you to force early depth-stencil testing. </p>
+            <p>One last detail I want to talk about relating to the snipped of code is the [earlydepthstencil] attribute, which is included for a reason. Early on, I noticed that when the camera was positioned to look at an object from an angle where one part of the object clearly obscured some other part of it, the fragments that <b>should have</b> failed the Early-Z test were still being rendered and written to the output texture. If you've done graphics programming before, you may know that modifiying depth (or using clip/discard) in a fragment shader disables Early-Z because the GPU can no longer assume the depth value will remain unchanged. Well, as it turns out, writing to a UAV texture also disables Early-Z. The [earlydepthstencil] attribute saves the day and forces Early-Z back on. This was one of the most difficult bugs I've dealth with in my career so far, because it stems from a rather obscure driver behavior. Had it not been for an article I found online that briefly mentioned this behavior, honestly, I would've never solved it!</p>
 
             <!-- <div class="project-image">
                 <img alt="Prototype Showcase" src="../assets/images/asfast_visibility_prototype.gif"/>
             </div> -->
 
-            <p>Here is how it works step by step (simplified):</p>
-            <ol>
-                <li>An artist prepares a simplified visibility mesh with custom UV mapping and renders the UVs as a low-res texture to serve as reference.</li>
-                <li>Broad-phase culling is handled by using Unity's OnBecameVisible and OnBecameInvisible build-in messages. A photographable object adds itself to a list when visible.</li>
-                <li>Based on it's position in the list, each candidate for visibility photographable object is assigned an ID, which is passed to the GPU as a uniform.</li>
-                <li>A custom render pass sets a random write target, which is a RWTexture2DArray.</li>
-                <li>The custom render pass filters and draws every candidate photo object in a batch.</li>
-                <li>The fragment shader writes visible fragments to a slice of the texture array using it's custom UVs, the reference size and previously passed ID</li>
-                <li>The render pass dispatches a compute shader, which adds together all visible pixels for each slice of the texture array.</li>
+            <p>So far I've mostly focused on the fragment shader, so let's take a broader look at the whole system to conclude this section:</p>
+            <ul>
+                <li>An artist creates a simplified visibility mesh with a custom UV layout and bakes the UVs into a low-resolution reference texture.</li>
+                <li>Photographable objects subscribe to Unity's built-in OnBecameVisible and OnBecameInvisible callbacks. When an object enters the camera frustum, it's added to the list of candidates.</li>
+                <li>Each candidate is assigned a unique ID, which is passed to the GPU as a uniform.</li>
+                <li>A custom render pass binds an RWTexture2DArray as the UAV output target.</li>
+                <li>The render pass filters and draws every candidate object in a batch.</li>
+                <li>The fragment shader writes data for every visible fragment to a slice of the texture array using it's UVs and ID for indexing.</li>
+                <li>A compute shader is dispatched, which accumulates the visibility, lightness, and focus values for each slice of the texture array.</li>
                 <li>The render pass requests asynchronous readback from the GPU.</li>
-                <li>When the read reqeust is complete, compare currently visible pixels to maximum visible pixels and if the visibility is greater than 0 add the object to a "currently in frame" list.</li>
-            </ol>
+                <li>When the read reqeust is complete, currently visible pixels are compared to maximum visible pixels. Any object with a visibility greater than zero is added to the list of objects currently in frame.</li>
+            </ul>
         </section>
        
         <section>
