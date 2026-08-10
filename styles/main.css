@@ -98,9 +98,13 @@ table {
 
 :root {
     --notlanders: #0072ce;
-    --background: #F8F4EF;
-    --surface: #EFE5DA;
-    --text-dark: #2F241D;
+    --background: #ece0d1;
+    --surface: #dbc1ac;
+    --text-dark: #38220f;
+    --border: #38220f;
+
+    --link: #634832;
+    --link-hover: #38220f;
 
     --primary: #A77F60;
     --secondary: #8A5F41;
@@ -131,6 +135,10 @@ nav {
     text-transform: uppercase;
     display: flex;
     gap: 1rem;
+}
+
+nav a {
+    text-decoration: none;
 }
 
 footer {
@@ -170,35 +178,37 @@ ul {
     padding-left: 1rem;
 }
 
-a {
-    transition: opacity 0.2s
-}
-
 b {
     font-weight: 600;
 }
 
+a {
+    transition: opacity 0.2s;
+    color: inherit;
+
+    text-decoration-thickness: 1px;
+    text-decoration-color: currentColor;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 4px;
+}
+
 /* unvisited link */
 a:link {
-    color: inherit;
-    text-decoration: none;
 }
 
-/* visited link */
+ /* visited link */
 a:visited {
-    color: inherit;
-    text-decoration: none;
 }
 
-/* mouse over link */
-a:hover {
-    opacity: 0.7;
-    text-decoration: none;
-}
+ /* mouse over link */
+ a:hover {
+     opacity: 0.7;
+ }
 
-a:active {
-    text-decoration: none;
-}
+ a:active {
+     text-decoration: none;
+ }
 
 /* Classes */
 
@@ -217,6 +227,7 @@ a:active {
     background-color: var(--surface);
     color: var(--text-dark);
     border-radius: 12px;
+    border: 2px solid var(--border);
     padding: 16px;
 }
 
@@ -228,6 +239,8 @@ a:active {
 
 .project-image {
     flex: 1;
+    border: 2px solid var(--border);
+    border-radius: 8px;
 }
 
 .project-image img,
@@ -301,6 +314,11 @@ a:active {
     background-color: var(--surface);
     border-radius: 5px;
     padding: 5px;
+    border: 2px solid var(--border);
+}
+
+a.project-button {
+    text-decoration: none;
 }
 
 #notlanders-link {
