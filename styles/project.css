@@ -72,6 +72,26 @@ ul {
     margin-bottom: 1rem;
 }
 
+video {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+    border-radius: 8px;
+}
+
+svg {
+    display: block;
+    margin-inline: auto;
+}
+
+img {
+    display: block;
+    margin-inline: auto;
+    margin: 1rem 0;
+    border-radius: 8px;
+}
 
 /* Classes */
 
