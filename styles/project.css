@@ -85,6 +85,7 @@ svg {
     display: block;
     margin: 1.5rem 0;
     margin-inline: auto;
+    max-width: 100%;
 }
 
 img {
