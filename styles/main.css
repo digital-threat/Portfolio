@@ -230,11 +230,14 @@ a:visited {
 }
 
 .about {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
     background-color: var(--surface);
     color: var(--text-dark);
     border-radius: 12px;
     border: 2px solid var(--border);
-    padding: 16px;
+    padding: 1.5rem;
 }
 
 .project-container {
@@ -340,10 +343,15 @@ a.project-button {
 /* Ids */
 
 #about-photo {
+    flex: 0 0 196px;
+    width: 196px;
+    height: 196px;
+    object-fit: cover;
     border-radius: 50%;
 }
 
 #about-text {
+    flex: 1;
     text-align: justify;
     font-size: 1.25rem;
     display: flex;
@@ -381,8 +389,9 @@ a.project-button {
         font-size: 1.3rem;
     }
 
-    #about-text {
-        font-size: 1.05rem;
+    .about {
+        flex-direction: column;
+        text-align: center;
     }
 
     .container {
@@ -391,5 +400,16 @@ a.project-button {
 
     .project-container {
         flex-direction: column;
+    }
+
+    #about-photo {
+        width: 150px;
+        height: 150px;
+        flex-basis: 150px;
+    }
+
+    #about-text {
+        text-align: left;
+        font-size: 1.05rem;
     }
 }
