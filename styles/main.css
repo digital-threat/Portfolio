@@ -389,6 +389,10 @@ a.project-button {
         font-size: 1.3rem;
     }
 
+    ul {
+        font-size: 1rem;
+    }
+
     .about {
         flex-direction: column;
         text-align: center;
