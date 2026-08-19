@@ -10,7 +10,7 @@ class Header extends HTMLElement {
     <nav>
         <a href="/index.html">Home</a>
 <!--        <a href="/pages/about.html">About</a>-->
-        <a href="/assets/Sergei_Grigorev_CV.pdf" target="_blank">CV</a>
+        <a href="/assets/Sergei_Grigorev_CV.pdf" target="_blank">Resume</a>
     </nav>
 </header>
     `;
