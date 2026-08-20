@@ -133,8 +133,8 @@ img {
         "Cascadia Code",
         "JetBrains Mono",
         monospace;
-    font-size: 0.95rem;
-    white-space: pre;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
     tab-size: 4;
 }
 
@@ -186,7 +186,7 @@ img {
 }
 
 @media (max-width: 700px) {
- .content h2 {
+    .content h2 {
      max-width: 100%;
- }
+    }
 }

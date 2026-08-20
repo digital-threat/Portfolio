@@ -69,7 +69,7 @@
     <span class="comment">...</span>
 
     <span class="type">float</span> <span class="variable">lightness</span> = <span class="function">ColorToLStar</span>(color);
-    <span class="type">float</span> <span class="variable">focus</span> = <span class="function">SampleCoCTexture</span>(i.positionNDC.xy / i.positionNDC.w);
+    <span class="type">float</span> <span class="variable">focus</span> = <span class="function">SampleCoCTexture</span>(i.positionNDC);
 
     <span class="type">uint2</span> <span class="variable">pixel</span> = uint2(i.uv * _ReferenceSize);
     <span class="variable">output</span>[pixel] = <span class="function">float2</span>(lightness, focus);
